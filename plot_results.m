@@ -197,14 +197,23 @@ function plot_results(results_conical, results_bell, ...
         else
             params = [opt(1), opt(2), 5 * r_t];
         end
-        [x, r, ~] = nozzle_geometry(res.geom_type, params, r_t);
-
-        % Upper wall
-        plot(x/r_t, r/r_t, '-', 'Color', line_colors{g}, 'LineWidth', 2.5, ...
+        [x_div, r_div, ~] = nozzle_geometry(res.geom_type, params, r_t);
+        
+        % Add a cosine converging section for visualization
+        r_inlet = 2.0 * r_t;       % inlet radius
+        L_conv  = 1.5 * r_t;       % converging length
+        N_conv  = 50;
+        x_conv  = linspace(-L_conv, 0, N_conv);
+        r_conv  = (r_inlet + r_t)/2 + (r_inlet - r_t)/2 * cos(pi * (x_conv + L_conv)/L_conv);
+        
+        % Concatenate (drop the duplicate throat point)
+        x_full = [x_conv, x_div(2:end)];
+        r_full = [r_conv, r_div(2:end)];
+        
+        plot(x_full/r_t, r_full/r_t, '-', 'Color', line_colors{g}, 'LineWidth', 2.5, ...
              'DisplayName', sprintf('%s  (C_F=%.4f)', geom_names{g}, res.opt_CF));
         hold on;
-        % Lower wall (mirror)
-        plot(x/r_t, -r/r_t, '-', 'Color', line_colors{g}, 'LineWidth', 2.5, ...
+        plot(x_full/r_t, -r_full/r_t, '-', 'Color', line_colors{g}, 'LineWidth', 2.5, ...
              'HandleVisibility', 'off');
     end
     % Throat marker
