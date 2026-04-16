@@ -115,10 +115,9 @@ function results = optimize_nozzle(geom_type, param1_vec, param2_vec, ...
                     theta_rad = atan((r(end) - r(1)) / (x(end) - x(1)));
                     lambda = (1 + cos(theta_rad)) / 2;
                 else
-                    % Bell nozzle: exit angle is much smaller than avg angle
-                    % dr/dx at exit for parabolic: 2*a*L + b
-                    theta_exit = atan(2*param1_vec(i)*x(end) + param2_vec(j));
-                    lambda = (1 + cos(theta_exit)) / 2;
+                    % Bell nozzle: exit angle IS the parameter
+                    theta_exit = deg2rad(param2_vec(j));
+                    lambda = 0.99;
                 end
 
                 CF_cruise(i,j)      = qoi_cruise.C_F * lambda;
