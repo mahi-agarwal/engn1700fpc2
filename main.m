@@ -19,7 +19,7 @@ R     = 287;         % specific gas constant for air (J/kg/K)
 % a cooler, lower-pressure mixed exhaust. This is the key to noise compliance.
 
 % --- CRUISE: 18 km altitude, core-dominated exhaust ---
-P_0_cruise   = 400000;    % stagnation pressure (Pa)
+P_0_cruise   = 120000;    % stagnation pressure (Pa)
 T_0_cruise   = 1000;      % stagnation temperature (K) — core exhaust
 P_inf_cruise = 7505;      % ambient at 18 km (Pa)
 
@@ -75,10 +75,11 @@ L_vec     = linspace(1.5, 8, 40);  % r_t units
 
 % --- Bell (parabolic) nozzle: r(x) = r_t + a*x^2 + b*x ---
 % Sweep: curvature a and initial slope b, fixed L = 5*r_t
-% Range chosen so exit radius r_e = 1 + 25a + 5b stays in [~1.1, ~2.5]
-% (area ratios ~1.2 to ~6, comparable to conical range)
-a_vec = linspace(-0.01, 0.03, 40);   % curvature (negative = bell shape that turns inward)
-b_vec = linspace(0.05, 0.40, 40);    % initial expansion slope
+% --- Bell (parabolic) nozzle: parameterized by (r_e, theta_exit) ---
+% r_e in [1.1, 2.5] gives A_e/A_t in [1.21, 6.25]
+% theta_exit in [1, 15] deg covers shallow-to-moderate bell exits
+re_vec    = linspace(1.1, 2.5, 40);
+theta_e_vec = linspace(1, 15, 40);
 
 %% ===== Validation =====
 fprintf('\n--- Validation checks ---\n');
@@ -113,7 +114,7 @@ results_conical = optimize_nozzle('conical', theta_vec, L_vec, ...
 fprintf('\n========================================\n');
 fprintf('BELL NOZZLE OPTIMIZATION\n');
 fprintf('========================================\n');
-results_bell = optimize_nozzle('bell', a_vec, b_vec, ...
+results_bell = optimize_nozzle('bell', re_vec, theta_e_vec, ...
     P_0_cruise, T_0_cruise, P_inf_cruise, ...
     P_0_takeoff, T_0_takeoff, P_inf_takeoff, ...
     gamma, R, r_t, Ve_limit, vane_CF_penalty);
