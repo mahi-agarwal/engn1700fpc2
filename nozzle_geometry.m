@@ -34,11 +34,14 @@ function [x, r, A] = nozzle_geometry(geom_type, params, r_t, N)
             r = r_t + x .* tan(theta);
 
         case 'bell'
-            a = params(1);
-            b = params(2);
-            L = params(3);
+            r_e         = params(1);                    % exit radius
+            theta_exit  = deg2rad(params(2));           % exit half-angle (deg input)
+            L           = params(3);
+            a = (L * tan(theta_exit) - (r_e - r_t)) / L^2;
+            b = tan(theta_exit) - 2 * a * L;
             x = linspace(0, L, N);
             r = r_t + a .* x.^2 + b .* x;
+    
 
         otherwise
             error('Unknown geometry type: %s. Use ''conical'' or ''bell''.', geom_type);
@@ -46,3 +49,4 @@ function [x, r, A] = nozzle_geometry(geom_type, params, r_t, N)
 
     A = pi .* r.^2;
 end
+
